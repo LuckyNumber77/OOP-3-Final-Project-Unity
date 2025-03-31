@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # OOP-3 Final Project - Unity Game 🎮
 
 This is the poker game that I will be coding for the OOP-3 Final Project.  
@@ -21,3 +22,7 @@ The project is being developed in Unity and tracked using Git and GitHub.
    Using Git or GitHub Desktop:
    ```bash
    git clone https://github.com/LuckyNumber77/OOP-3-Final-Project-Unity.git
+=======
+# OOP-3-Final-Project-Unity
+This is the poker Game that I will be coding.
+>>>>>>> df0e695d9eb58af60f86ad60da7f9d60cdb5b0da
