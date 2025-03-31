@@ -1,12 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-public class MainMenu : MonoBehaviour
+public class CardUI : MonoBehaviour
 {
-    public void PlayGame()
+    public Image cardImage;
+    public string cardName;
+    public int cardValue;
+
+    public void Setup(Sprite image, string name, int value)
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        cardImage.sprite = image;
+        cardName = name;
+        cardValue = value;
     }
 }
