@@ -14,11 +14,12 @@ public class DeckManager : MonoBehaviour
 
     [Header("Deck Setup")]
     public List<CardData> cardDeck = new List<CardData>();
-    public GameObject cardUIPrefab;
+    public GameObject cardPrefab;
 
     [Header("Card Display Areas")]
     public Transform player1CardArea;
     public Transform player2CardArea;
+    public Transform dealerCardArea;
 
     private int currentCardIndex = 0;
 
@@ -40,6 +41,15 @@ public class DeckManager : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+
+        // Clear dealer's card area
+        if (dealerCardArea != null)
+        {
+            foreach (Transform child in dealerCardArea)
+            {
+                Destroy(child.gameObject);
+            }
+        }
     }
 
     /// <summary>
@@ -57,12 +67,20 @@ public class DeckManager : MonoBehaviour
 
         for (int i = 0; i < cardCount && currentCardIndex < cardDeck.Count; i++)
         {
-            GameObject card = Instantiate(cardUIPrefab, cardArea);
+            GameObject card = Instantiate(cardPrefab, cardArea);
             CardDisplay display = card.GetComponent<CardDisplay>();
 
             if (display != null)
             {
                 display.cardImage.sprite = cardDeck[currentCardIndex].image;
+
+                // If we have a full CardDisplay implementation with setup method
+                if (display.GetType() == typeof(CardDisplay))
+                {
+                    display.Setup(cardDeck[currentCardIndex].image,
+                                  cardDeck[currentCardIndex].name,
+                                  cardDeck[currentCardIndex].value);
+                }
             }
             else
             {
@@ -72,6 +90,136 @@ public class DeckManager : MonoBehaviour
             currentCardIndex++;
         }
     }
+
+    /// <summary>
+    /// Deals a single card to a player and returns the card data
+    /// </summary>
+    public CardData DealCardToPlayer(int playerNumber)
+    {
+        if (playerNumber != 1 && playerNumber != 2)
+        {
+            Debug.LogWarning("Invalid player number passed to DealCardToPlayer.");
+            return null;
+        }
+
+        Transform cardArea = (playerNumber == 1) ? player1CardArea : player2CardArea;
+
+        if (currentCardIndex >= cardDeck.Count)
+        {
+            Debug.LogWarning("Out of cards in the deck!");
+            return null;
+        }
+
+        // Get the current card
+        CardData currentCard = cardDeck[currentCardIndex];
+
+        // Create the visual card
+        GameObject card = Instantiate(cardPrefab, cardArea);
+        CardDisplay display = card.GetComponent<CardDisplay>();
+
+        if (display != null)
+        {
+            display.cardImage.sprite = currentCard.image;
+
+            // If we have a full CardDisplay implementation with setup method
+            if (display is CardDisplay cardDisplay)
+            {
+                cardDisplay.Setup(currentCard.image, currentCard.name, currentCard.value);
+            }
+        }
+
+        // Increment card index
+        currentCardIndex++;
+
+        return currentCard;
+    }
+
+    /// <summary>
+    /// Deals a card to the dealer and returns the card data
+    /// </summary>
+    public CardData DealCardToDealer()
+    {
+        if (dealerCardArea == null)
+        {
+            Debug.LogWarning("Dealer card area is not assigned.");
+            return null;
+        }
+
+        if (currentCardIndex >= cardDeck.Count)
+        {
+            Debug.LogWarning("Out of cards in the deck!");
+            return null;
+        }
+
+        // Get the current card
+        CardData currentCard = cardDeck[currentCardIndex];
+
+        // Create the visual card
+        GameObject card = Instantiate(cardPrefab, dealerCardArea);
+        CardDisplay display = card.GetComponent<CardDisplay>();
+
+        if (display != null)
+        {
+            display.cardImage.sprite = currentCard.image;
+
+            // If we have a full CardDisplay implementation with setup method
+            if (display is CardDisplay cardDisplay)
+            {
+                cardDisplay.Setup(currentCard.image, currentCard.name, currentCard.value);
+            }
+        }
+
+        // Increment card index
+        currentCardIndex++;
+
+        return currentCard;
+    }
+
+    /// <summary>
+    /// Returns the last card that was dealt from the deck
+    /// </summary>
+    public CardData DealCardToPlayer(int playerNumber)
+    {
+        if (playerNumber != 1 && playerNumber != 2)
+        {
+            Debug.LogWarning("Invalid player number passed to DealCardToPlayer.");
+            return null;
+        }
+
+        Transform cardArea = (playerNumber == 1) ? player1CardArea : player2CardArea;
+
+        if (currentCardIndex >= cardDeck.Count)
+        {
+            Debug.LogWarning("Out of cards in the deck!");
+            HandleDeckExhaustion();  // Call to handle when the deck is exhausted
+            return null;
+        }
+
+        // Get the current card
+        CardData currentCard = cardDeck[currentCardIndex];
+
+        // Create the visual card
+        GameObject card = Instantiate(cardPrefab, cardArea);
+        CardDisplay display = card.GetComponent<CardDisplay>();
+
+        if (display != null)
+        {
+            display.cardImage.sprite = currentCard.image;
+
+            // If we have a full CardDisplay implementation with setup method
+            if (display is CardDisplay cardDisplay)
+            {
+                cardDisplay.Setup(currentCard.image, currentCard.name, currentCard.value);
+            }
+        }
+
+        // Increment card index
+        currentCardIndex++;
+
+        return currentCard;
+    }
+
+
     public void ShuffleDeck()
     {
         for (int i = 0; i < cardDeck.Count; i++)
@@ -84,6 +232,4 @@ public class DeckManager : MonoBehaviour
 
         Debug.Log("Deck shuffled.");
     }
-
 }
-
