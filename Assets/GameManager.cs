@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
@@ -337,7 +338,8 @@ public class GameManager : MonoBehaviour
         PlayerData player = (playerNumber == 1) ? player1 : player2;
         PlayerController playerController = (playerNumber == 1) ? player1Controller : player2Controller;
 
-        if (player.hand.Count == 2 && player.balance >= playerController.GetCurrentBet())
+        if (player.hand.Count == 2
+            && player.balance >= playerController.GetCurrentBet())
         {
             int currentBet = playerController.GetCurrentBet();
             player.balance -= currentBet; // Deduct the additional bet
