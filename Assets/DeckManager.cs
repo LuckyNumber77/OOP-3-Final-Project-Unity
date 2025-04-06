@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class DeckManager : MonoBehaviour
+public class DeckManager : MonoBehaviour, IDeckManager
 {
     [System.Serializable]
     public class CardData
@@ -149,7 +149,7 @@ public class DeckManager : MonoBehaviour
         }
 
         currentCardIndex++;
-        return currentCard;  // This is the return value
+        return currentCard;
     }
 
     /// <summary>
@@ -157,12 +157,23 @@ public class DeckManager : MonoBehaviour
     /// </summary>
     private void HandleDeckExhaustion()
     {
+<<<<<<< Updated upstream
         Debug.LogError("Deck is exhausted! Consider reshuffling or ending game.");
         ShuffleDeck();
         currentCardIndex = 0;
         // Optional: Trigger UI/logic for reshuffling, ending round, etc.
     }
 
+=======
+        Debug.Log("Handling deck exhaustion: Reshuffling the deck.");
+        ShuffleDeck();
+        currentCardIndex = 0; // Reset index after shuffling
+    }
+
+    /// <summary>
+    /// Shuffles the deck randomly.
+    /// </summary>
+>>>>>>> Stashed changes
     public void ShuffleDeck()
     {
         for (int i = 0; i < cardDeck.Count; i++)
