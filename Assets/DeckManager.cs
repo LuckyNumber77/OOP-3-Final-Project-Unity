@@ -158,26 +158,11 @@ public class DeckManager : MonoBehaviour
     private void HandleDeckExhaustion()
     {
         Debug.LogError("Deck is exhausted! Consider reshuffling or ending game.");
+        ShuffleDeck();
+        currentCardIndex = 0;
         // Optional: Trigger UI/logic for reshuffling, ending round, etc.
     }
 
-<<<<<<< Updated upstream
-    /// <summary>
-    /// Shuffles the deck randomly.
-    /// </summary>
-=======
-    private void HandleDeckExhaustion()
-    {
-        // Logic to handle what happens when the deck runs out of cards
-        // For example, reshuffle the discarded cards or notify players that the game needs to be reset
-        Debug.Log("Handling deck exhaustion: Reshuffling the deck.");
-        ShuffleDeck();
-        currentCardIndex = 0; // Reset index after shuffling
-    }
-
-
-
->>>>>>> Stashed changes
     public void ShuffleDeck()
     {
         for (int i = 0; i < cardDeck.Count; i++)
@@ -191,7 +176,3 @@ public class DeckManager : MonoBehaviour
         Debug.Log("Deck shuffled.");
     }
 }
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
