@@ -31,6 +31,17 @@ public class PlayerController : MonoBehaviour
     {
         balanceText.text = "Balance\n$" + balance.ToString();
     }
+    private int currentBet;
+
+    public int GetCurrentBet()
+    {
+        return currentBet;
+    }
+
+    public void SetBet(int betAmount)
+    {
+        currentBet = betAmount;
+    }
 
     void PlaceBet()
     {

@@ -1,10 +1,10 @@
 using UnityEngine;
-using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Collections;
 using Unity.VisualScripting;
+using static DeckManager;
 
 public class GameManager : MonoBehaviour
 {
@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     // In-game Text
     public TextMeshProUGUI gameStatusText;
 
+    public Button btnDoubleDown; 
     // Game Controls
     public Button btnNewGame;
     public Button btnDealCards;
@@ -387,18 +388,23 @@ public class GameManager : MonoBehaviour
         // Deal initial cards to dealer if not already dealt
         while (CalculateHandValue(dealerHand) < 17)
         {
-            DeckManager.CardData card = deckManager.DrawCardToDealer();
-            dealerHand.Add(card);
-            UpdateDealerHandValueDisplay(CalculateHandValue(dealerHand));
+            // Use the DealCardToDealer method, which returns a CardData
+            CardData card = deckManager.DealCardToDealer();
+            if (card != null)
+            {
+                dealerHand.Add(card);
+                UpdateDealerHandValueDisplay(CalculateHandValue(dealerHand));
 
-            // Update UI for each card drawn
-            yield return new WaitForSeconds(0.5f); // Delay between cards for visibility
+                // Update UI for each card drawn
+                yield return new WaitForSeconds(0.5f); // Delay between cards for visibility
+            }
         }
 
         // After dealer is done, check and display results
         CheckFinalResults();
         yield return new WaitForSeconds(1.0f); // Pause before showing results
     }
+
 
     private void UpdateDealerHandValueDisplay(int value)
     {
