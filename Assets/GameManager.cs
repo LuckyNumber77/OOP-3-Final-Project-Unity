@@ -3,6 +3,7 @@ using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
 using static DeckManager;
 
@@ -115,6 +116,9 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        
+    
         player1 = new PlayerData(player1Input.text.Length > 0 ? player1Input.text : "Player 1");
         player2 = new PlayerData(player2Input.text.Length > 0 ? player2Input.text : "Player 2");
 
