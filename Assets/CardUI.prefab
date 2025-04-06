@@ -89,3 +89,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardImage: {fileID: 1695851976951009663}
+  cardName: {fileID: 0}
+  cardValue: {fileID: 0}
+  faces: []
+  cardBack: {fileID: 0}
+  cardIndex: 0
