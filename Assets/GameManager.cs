@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
 
     private PlayerData player1;
     private PlayerData player2;
-    private int currentPlayerTurn = 1;
+   
 
     private List<DeckManager.CardData> player1Hand = new List<DeckManager.CardData>();
     private List<DeckManager.CardData> player2Hand = new List<DeckManager.CardData>();
@@ -181,7 +181,6 @@ public class GameManager : MonoBehaviour
         // In-game status text
         gameStatusText.text = "Player 1's Turn";
 
-        currentPlayerTurn = 1;
     }
 
     private void DealInitialCards()
@@ -287,7 +286,7 @@ public class GameManager : MonoBehaviour
         {
             player1Controller.SetActionButtons(false);
             player2Controller.SetActionButtons(true);
-            currentPlayerTurn = 2;
+          
             gameStatusText.text = "Player 2's Turn";
         }
         else if (playerNumber == 2)
@@ -325,7 +324,7 @@ public class GameManager : MonoBehaviour
             {
                 player1Controller.SetActionButtons(false);
                 // Player 1 busted, switch to player 2's turn
-                currentPlayerTurn = 2;
+               
                 player2Controller.SetActionButtons(true);
                 gameStatusText.text = "Player 1 Busted! Player 2's Turn";
             }
