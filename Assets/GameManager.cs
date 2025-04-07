@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
     // In-game Text
     public TextMeshProUGUI gameStatusText;
 
-    public Button btnDoubleDown; 
+   
     // Game Controls
     public Button btnNewGame;
     public Button btnDealCards;
@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Assuming btnDoubleDown is your double down button
-        btnDoubleDown.onClick.AddListener(delegate { DoubleDown(currentPlayerTurn); });
+     
 
         // Setup Hit and Stand Button listeners
         player1Controller.btnHit.onClick.AddListener(delegate { PlayerHit(1); });
