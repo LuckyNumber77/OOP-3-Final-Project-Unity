@@ -137,7 +137,7 @@ public class DeckManager : MonoBehaviour, IDeckManager
     /// </summary>  
     private void HandleDeckExhaustion()
     {
-        Debug.LogError("Deck is exhausted! Reshuffling the deck.");
+        Debug.LogError("Deck is exhausted! Consider reshuffling or ending game.");
         ShuffleDeck();
         currentCardIndex = 0; // Reset index after shuffling  
     }
