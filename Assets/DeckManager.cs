@@ -137,24 +137,14 @@ public class DeckManager : MonoBehaviour, IDeckManager
     /// </summary>  
     private void HandleDeckExhaustion()
     {
-<<<<<<< Updated upstream
         Debug.LogError("Deck is exhausted! Reshuffling the deck.");
-=======
-        Debug.Log("Handling deck exhaustion: Reshuffling the deck.");
->>>>>>> Stashed changes
         ShuffleDeck();
         currentCardIndex = 0; // Reset index after shuffling
     }
 
-<<<<<<< Updated upstream
     /// <summary>  
     /// Shuffles the deck randomly.  
     /// </summary>  
-=======
-    /// <summary>
-    /// Shuffles the deck randomly.
-    /// </summary>
->>>>>>> Stashed changes
     public void ShuffleDeck()
     {
         for (int i = 0; i < cardDeck.Count; i++)
