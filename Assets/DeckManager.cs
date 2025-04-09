@@ -13,7 +13,7 @@ public class DeckManager : MonoBehaviour, IDeckManager
     }
 
     [Header("Deck Setup")]
-    public List<CardData> cardDeck = new List<CardData>(); // Use this deck  
+    public List<CardData> cardDeck = new List<CardData>(); // List of card data (deck)
     public GameObject cardPrefab;
 
     [Header("Card Display Areas")]
@@ -36,7 +36,7 @@ public class DeckManager : MonoBehaviour, IDeckManager
     }
 
     /// <summary>  
-    /// Handles card area clearing.  
+    /// Clears cards from the specified card area.
     /// </summary>  
     private void ClearCardArea(Transform cardArea)
     {
@@ -44,13 +44,13 @@ public class DeckManager : MonoBehaviour, IDeckManager
         {
             foreach (Transform child in cardArea)
             {
-                Destroy(child.gameObject);
+                Destroy(child.gameObject);  // Destroy all card objects in the area
             }
         }
     }
 
     /// <summary>  
-    /// Deals a specified number of cards to the given player (1 or 2).  
+    /// Deals a specified number of cards to a given player (1 or 2).  
     /// </summary>  
     public void DealCardsToPlayer(int playerNumber, int cardCount)
     {
@@ -110,12 +110,18 @@ public class DeckManager : MonoBehaviour, IDeckManager
     }
 
     /// <summary>  
-    /// Deals a card to the specified card area and returns the card data.  
+    /// Deals a single card to the specified card area and returns the card data.  
     /// </summary>  
     private CardData DealCard(Transform cardArea)
     {
+        if (currentCardIndex >= cardDeck.Count)
+        {
+            HandleDeckExhaustion();
+            return null;
+        }
+
         CardData currentCard = cardDeck[currentCardIndex];
-        GameObject card = Instantiate(cardPrefab, cardArea);
+        GameObject card = Instantiate(cardPrefab, cardArea);  // Instantiate the card prefab
         CardDisplay display = card.GetComponent<CardDisplay>();
 
         if (display != null)
@@ -133,7 +139,7 @@ public class DeckManager : MonoBehaviour, IDeckManager
     }
 
     /// <summary>  
-    /// Handles logic when deck is exhausted.  
+    /// Handles logic when the deck is exhausted (reshuffles the deck).  
     /// </summary>  
     private void HandleDeckExhaustion()
     {
@@ -143,16 +149,18 @@ public class DeckManager : MonoBehaviour, IDeckManager
     }
 
     /// <summary>  
-    /// Shuffles the deck randomly.  
+    /// Shuffles the deck using Fisher-Yates shuffle algorithm.  
     /// </summary>  
     public void ShuffleDeck()
     {
-        for (int i = 0; i < cardDeck.Count; i++)
+        int n = cardDeck.Count;
+        while (n > 1)
         {
-            CardData temp = cardDeck[i];
-            int randomIndex = Random.Range(i, cardDeck.Count);
-            cardDeck[i] = cardDeck[randomIndex];
-            cardDeck[randomIndex] = temp;
+            n--;
+            int k = Random.Range(0, n + 1);
+            CardData value = cardDeck[k];
+            cardDeck[k] = cardDeck[n];
+            cardDeck[n] = value;
         }
 
         Debug.Log("Deck shuffled.");

@@ -1,20 +1,17 @@
-﻿using System;
+﻿using UnityEngine;
 
+[System.Serializable]
 public class Card
 {
-	public string Suit { get; set; }
-	public string Value { get; set; }
+    public string rank;
+    public string suit;
+    public int cardValue;  // Represents the card's value in the game (e.g., 10 for a 10 card)
 
-	// Default constructor
-	public Card(string suit, string value)
-	{
-		Suit = suit;
-		Value = value;
-	}
-
-	// Optionally, you can add a method to display the card info
-	public void DisplayCard()
-	{
-		Console.WriteLine($"Card: {Value} of {Suit}");
-	}
+    // Constructor
+    public Card(string rank, string suit, int cardValue)
+    {
+        this.rank = rank;
+        this.suit = suit;
+        this.cardValue = cardValue;
+    }
 }

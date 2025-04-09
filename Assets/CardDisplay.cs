@@ -3,42 +3,36 @@ using UnityEngine.UI;
 
 public class CardDisplay : MonoBehaviour
 {
-    public Image cardImage;
+    public Image cardImage;       // Image to display the card (UI element)
 
-    public Text cardName;
-    public Text cardValue;
+    public Text cardName;         // Text to display card name (e.g., "Ace of Spades")
+    public Text cardValue;        // Text to display card value (e.g., 10, Ace, etc.)
 
-    public Sprite[] faces;  // Array to hold card faces
-    public Sprite cardBack; // Card back sprite
+    public Sprite[] faces;        // Array to hold all possible face images (Card faces)
+    public Sprite cardBack;       // Image for the card's back (when not showing the face)
 
-    public int cardIndex;   // Index to represent the current card face
+    public int cardIndex;         // Index to identify the current card face in the `faces` array
 
-    private SpriteRenderer spriteRenderer;  // Declare spriteRenderer
-
-
-
+    // Method to set up the card details (image, name, and value)
     public void Setup(Sprite image, string name, int value)
     {
-        cardImage.sprite = image;
-        cardName.text = name;
-        cardValue.text = value.ToString();  // Assuming you want to display the value as text
-    }
-    // Called to toggle between showing face and back of the card
-    public void Toggleface(bool surface)
-    {
-        if (surface)  // If surface is true, show the card face
-        {
-            spriteRenderer.sprite = faces[cardIndex];
-        }
-        else  // Otherwise, show the card back
-        {
-            spriteRenderer.sprite = cardBack;
-        }
+        cardImage.sprite = image;                 // Set card image
+        cardName.text = name;                     // Set card name (e.g., "Ace of Spades")
+        cardValue.text = value.ToString();        // Set card value (e.g., "10", "Ace", etc.)
     }
 
-    // Initialize spriteRenderer
-    private void Awake()
+    // Method to toggle between showing the face and back of the card
+    public void ToggleFace(bool isFaceUp)
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();  // Corrected: fixed typo in component name ("SpriteRenderer" instead of "SpriteRendered")
+        if (isFaceUp)
+        {
+            // Show the face of the card (based on cardIndex)
+            cardImage.sprite = faces[cardIndex];
+        }
+        else
+        {
+            // Show the back of the card
+            cardImage.sprite = cardBack;
+        }
     }
 }
