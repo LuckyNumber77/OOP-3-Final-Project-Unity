@@ -116,7 +116,6 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         
     
         player1 = new PlayerData(player1Input.text.Length > 0 ? player1Input.text : "Player 1");
