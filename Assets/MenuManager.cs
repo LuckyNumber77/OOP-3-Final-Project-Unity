@@ -19,11 +19,5 @@ public class MenuManager : MonoBehaviour
         rulesPanel.SetActive(true); // Show the Rules Panel
     }
 
-    // Called when Close button on Rules Panel is clicked
-    public void HideRules()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
-        rulesPanel.SetActive(false); // Hide the Rules Panel
-    }
+    
 }
