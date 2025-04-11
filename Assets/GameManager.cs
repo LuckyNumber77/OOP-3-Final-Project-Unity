@@ -39,52 +39,70 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        InitializeGame();
+        // Check if we're in the Start Menu or Game Play scene
+        if (SceneManager.GetActiveScene().name == "Start Menu")
+        {
+            // In Start Menu scene, just set up the start game button
+            if (btnNewGame != null)
+                btnNewGame.onClick.AddListener(StartGame);
+        }
+        else // We're in the Game Play scene
+        {
+            // Get player names from PlayerPrefs if they exist
+            string player1Name = PlayerPrefs.GetString("Player1Name", "Player 1");
+            string player2Name = PlayerPrefs.GetString("Player2Name", "Player 2");
+
+            // Initialize with the player names
+            player1 = new PlayerData(player1Name);
+            player2 = new PlayerData(player2Name);
+
+            InitializeGame();
+        }
     }
 
     private void InitializeGame()
     {
         SetupButtons();
-        ResetGameData();
-        gameStatusText.text = "Welcome to Blackjack! Press Start Game to begin.";
-    }
-
-    private void SetupButtons()
-    {
-        btnNewGame.onClick.AddListener(StartGame);
-        btnDealCards.onClick.AddListener(StartNewRound);
-        player1Controller.btnHit.onClick.AddListener(() => PlayerHit(1));
-        player2Controller.btnHit.onClick.AddListener(() => PlayerHit(2));
-        player1Controller.btnStand.onClick.AddListener(() => PlayerStand(1));
-        player2Controller.btnStand.onClick.AddListener(() => PlayerStand(2));
-    }
-
-    private void ResetGameData()
-    {
-        player1 = new PlayerData("Player 1");
-        player2 = new PlayerData("Player 2");
-
         UpdateBalanceUI();
         player1Controller.SetActionButtons(false);
         player2Controller.SetActionButtons(false);
-    }
-
-    public void StartGame()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-
-        player1 = new PlayerData(player1Input.text.Length > 0 ? player1Input.text : "Player 1");
-        player2 = new PlayerData(player2Input.text.Length > 0 ? player2Input.text : "Player 2");
-
-        UpdateBalanceUI();
-        deckManager.ResetDeck();
-        deckManager.ShuffleDeck();
+        gameStatusText.text = "Welcome to Blackjack! Place your bets to start.";
 
         // Allow both players to place bets
         player1Controller.EnableBettingOnly(true);
         player2Controller.EnableBettingOnly(true);
+    }
 
-        gameStatusText.text = "Place your bets to start the round.";
+    private void SetupButtons()
+    {
+        // Only set up these buttons in the Game Play scene
+        if (btnDealCards != null)
+            btnDealCards.onClick.AddListener(StartNewRound);
+
+        if (player1Controller != null && player1Controller.btnHit != null)
+            player1Controller.btnHit.onClick.AddListener(() => PlayerHit(1));
+
+        if (player2Controller != null && player2Controller.btnHit != null)
+            player2Controller.btnHit.onClick.AddListener(() => PlayerHit(2));
+
+        if (player1Controller != null && player1Controller.btnStand != null)
+            player1Controller.btnStand.onClick.AddListener(() => PlayerStand(1));
+
+        if (player2Controller != null && player2Controller.btnStand != null)
+            player2Controller.btnStand.onClick.AddListener(() => PlayerStand(2));
+    }
+
+    public void StartGame()
+    {
+        // Store player names in PlayerPrefs to persist between scenes
+        if (player1Input != null)
+            PlayerPrefs.SetString("Player1Name", player1Input.text.Length > 0 ? player1Input.text : "Player 1");
+
+        if (player2Input != null)
+            PlayerPrefs.SetString("Player2Name", player2Input.text.Length > 0 ? player2Input.text : "Player 2");
+
+        // Now load the Game Play scene
+        SceneManager.LoadScene("Game Play");
     }
 
     public void StartNewRound()
@@ -283,8 +301,8 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            resultMessage += DetermineWinner(player1Value, dealerValue, 1); // Corrected: pass both player and dealer values
-            resultMessage += DetermineWinner(player2Value, dealerValue, 2); // Corrected: pass both player and dealer values
+            resultMessage += DetermineWinner(player1Value, dealerValue, 1);
+            resultMessage += DetermineWinner(player2Value, dealerValue, 2);
         }
 
         gameStatusText.text = resultMessage;
