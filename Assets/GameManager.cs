@@ -320,3 +320,34 @@ public class GameManager : MonoBehaviour
             return $"Player {playerNumber} loses. ";
     }
 }
+int dealerTotal = CalculateDealerTotal(); // your function
+dealerHandValueText.text = "Dealer Hand: " + dealerTotal;
+
+
+playerBalanceText.text = "Balance: $" + playerBalance;
+playerBetText.text = "Bet: $" + currentBet;
+playerHandValueText.text = "Hand: " + playerHandTotal;
+
+if (playerTotal > 21)
+{
+    endGameMessage.text = player1Name + " busted! Dealer wins!";
+}
+else if (dealerTotal > 21)
+{
+    endGameMessage.text = "Dealer busts! " + player1Name + " wins!";
+}
+else if (playerTotal > dealerTotal)
+{
+    endGameMessage.text = player1Name + " wins!";
+}
+else if (dealerTotal > playerTotal)
+{
+    endGameMessage.text = "Dealer wins!";
+}
+else
+{
+    endGameMessage.text = "It's a tie!";
+}
+
+// Show the message
+endGameMessage.gameObject.SetActive(true);
