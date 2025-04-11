@@ -440,10 +440,10 @@ MonoBehaviour:
   deckManager: {fileID: 1090488813}
   dealerCardArea: {fileID: 1994251350}
   dealerHandValueText: {fileID: 498579998}
-  player1Controller: {fileID: 0}
+  player1Controller: {fileID: 570363302}
   player1Input: {fileID: 950516068}
   player1BetInput: {fileID: 950516068}
-  player1BalanceText: {fileID: 309817028}
+  player1BalanceText: {fileID: 259558606}
   player1HandValueText: {fileID: 936033263}
   gameStatusText: {fileID: 1631211826}
   btnNewGame: {fileID: 0}
@@ -1315,6 +1315,7 @@ GameObject:
   - component: {fileID: 570363299}
   - component: {fileID: 570363301}
   - component: {fileID: 570363300}
+  - component: {fileID: 570363302}
   m_Layer: 5
   m_Name: PlayerInfoPanel
   m_TagString: Untagged
@@ -1382,6 +1383,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 570363298}
   m_CullTransparentMesh: 1
+--- !u!114 &570363302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 570363298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84400141cab43a046a973f24307599e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerNameInput: {fileID: 950516068}
+  balanceText: {fileID: 309817028}
+  betDisplayText: {fileID: 259558606}
+  handValueText: {fileID: 936033263}
+  btnHit: {fileID: 1412056365}
+  btnStand: {fileID: 943416612}
+  gameManager: {fileID: 104208464}
 --- !u!1 &649628110
 GameObject:
   m_ObjectHideFlags: 0
@@ -2093,8 +2113,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278791423
-  m_fontColor: {r: 1, g: 0.17254902, b: 0.03529412, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2393,7 +2413,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 943416613}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 104208464}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: PlayerStand
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &943416613
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2468,7 +2500,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -3638, y: -949}
+  m_AnchoredPosition: {x: -3797, y: -969}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &949072115
@@ -2514,7 +2546,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 949072116}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 570363302}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: AddBet
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &949072116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2703,7 +2747,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3416,7 +3460,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1284062243}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 104208462}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1284062243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3621,7 +3677,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1412056366}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 104208464}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: PlayerHit
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1412056366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3806,6 +3874,7 @@ GameObject:
   - component: {fileID: 1784696590}
   - component: {fileID: 1784696589}
   - component: {fileID: 1784696588}
+  - component: {fileID: 1784696592}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -3910,6 +3979,25 @@ RectTransform:
   m_AnchoredPosition: {x: 161, y: 218.2}
   m_SizeDelta: {x: 1204.2958, y: 1632.1573}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1784696592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1784696587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84400141cab43a046a973f24307599e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerNameInput: {fileID: 0}
+  balanceText: {fileID: 0}
+  betDisplayText: {fileID: 0}
+  handValueText: {fileID: 0}
+  btnHit: {fileID: 0}
+  btnStand: {fileID: 0}
+  gameManager: {fileID: 0}
 --- !u!1 &1797758647
 GameObject:
   m_ObjectHideFlags: 0
@@ -4201,7 +4289,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1918180618}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 570363302}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: AddBet
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1918180618
 MonoBehaviour:
   m_ObjectHideFlags: 0
