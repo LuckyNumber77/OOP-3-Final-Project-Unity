@@ -1,18 +1,20 @@
-<<<<<<< HEAD
 # OOP-3 Final Project - Unity Game 🎮
 
-This is the poker game that I will be coding for the OOP-3 Final Project.  
-The project is being developed in Unity and tracked using Git and GitHub.
+This is the **Blackjack** game that I am coding for the OOP-3 Final Project.  
+The project is being developed in **Unity 2022.3.5f1** and tracked using **Git** and **GitHub**.
 
 ---
 
 ## 🛠️ Project Setup
 
 ### ✅ Requirements
-- **Unity Version**: *[insert your version here, e.g., 2022.3.5f1]*
+- **Unity Version**: 2022.3.5f1
 - **Dependencies/Packages**:
   - TextMeshPro (Included by default in Unity)
-  - [List any other assets/packages used]
+  - Universal RP (Universal Render Pipeline)
+  - SVG Importer (for vector graphics)
+  - Custom card deck images
+  - Basic UI assets
 
 ---
 
@@ -22,7 +24,15 @@ The project is being developed in Unity and tracked using Git and GitHub.
    Using Git or GitHub Desktop:
    ```bash
    git clone https://github.com/LuckyNumber77/OOP-3-Final-Project-Unity.git
-=======
-# OOP-3-Final-Project-Unity
-This is the poker Game that I will be coding.
->>>>>>> df0e695d9eb58af60f86ad60da7f9d60cdb5b0da
+
+Assets/
+├── Cards/               # Card images and sprites
+├── Editor/              # Editor-related files (if any)
+├── Fonts/               # Fonts (e.g., TextMeshPro fonts)
+├── Prefabs/             # Prefab objects
+├── Scenes/              # Scene files (Start Menu, Game Play)
+├── Scripts/             # C# scripts (DeckManager, GameManager, etc.)
+├── Settings/            # Project settings
+├── SVG-cards-1.3/       # SVG card assets
+├── TextMeshPro/         # TextMeshPro essentials
+├── Texture/             # Additional textures
