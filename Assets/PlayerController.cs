@@ -15,9 +15,9 @@ public class PlayerController : MonoBehaviour
     public Button btnHit;
     public Button btnStand;
 
-    // Reference to GameManager and Player Number
+    // Reference to GameManager; for single-player this controller always handles "Player 1"
     public GameManager gameManager;
-    public int playerNumber; // 1 for Player1, 2 for Player2
+    private int playerNumber = 1; // Always use player number 1
 
     // Player's Balance and Bet Information
     private int balance = 1000;
@@ -30,6 +30,8 @@ public class PlayerController : MonoBehaviour
             gameManager = FindObjectOfType<GameManager>(); // Find GameManager if not set
         }
 
+        // Force this controller to be for player 1
+        playerNumber = 1;
         InitializePlayer();
     }
 
@@ -43,7 +45,7 @@ public class PlayerController : MonoBehaviour
         btnHit.onClick.AddListener(Hit);
         btnStand.onClick.AddListener(Stand);
 
-        // Set initial button states
+        // Set initial button states: enable only betting, disable actions until a bet is placed
         EnableBettingOnly(true);
     }
 
@@ -76,10 +78,10 @@ public class PlayerController : MonoBehaviour
                 UpdateBalanceText();
                 Debug.Log(playerNameInput.text + " placed a bet of $" + betAmount);
 
-                // Notify GameManager that the bet was placed
+                // Notify the GameManager that player 1 has placed a bet
                 gameManager.PlayerPlacedBet(playerNumber, betAmount);
 
-                // Disable betting buttons and enable action buttons
+                // Disable the betting button and enable action buttons
                 EnableBettingOnly(false);
                 SetActionButtons(true);
             }
@@ -99,7 +101,7 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log(playerNameInput.text + " chose to HIT!");
 
-        // Call the GameManager to handle dealing a card to this player
+        // Delegate to GameManager to handle dealing a card to player 1
         gameManager.PlayerHit(playerNumber);
     }
 
@@ -108,9 +110,9 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log(playerNameInput.text + " chose to STAND!");
 
-        // Disable action buttons and notify GameManager
+        // Disable action buttons and notify GameManager that player 1 stands
         SetActionButtons(false);
-        gameManager.PlayerStand(playerNumber);  // Call GameManager's PlayerStand method
+        gameManager.PlayerStand(playerNumber);
     }
 
     // Enable/Disable action buttons (Hit & Stand)
@@ -147,12 +149,12 @@ public class PlayerController : MonoBehaviour
         return balance;
     }
 
-    // Reset player for a new round (clear bet, enable only betting)
+    // Reset player for a new round: clear bet input, reset hand display, and enable betting only
     public void ResetForNewRound()
     {
-        betAmountInput.text = "";  // Clear bet input field
-        handValueText.text = "Hand: 0";  // Reset hand value text
-        EnableBettingOnly(true);   // Re-enable betting
-        SetActionButtons(false);   // Disable action buttons until bet is placed
+        betAmountInput.text = "";
+        handValueText.text = "Hand: 0";
+        EnableBettingOnly(true);
+        SetActionButtons(false);
     }
 }

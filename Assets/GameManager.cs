@@ -1,115 +1,127 @@
 using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    // References to other components
-    public DeckManager deckManager;
-    public PlayerController player1Controller;
-    public PlayerController player2Controller;
-    public TMP_InputField player1Input;
-    public TMP_InputField player2Input;
-    public TMP_InputField player1BetInput;
-    public TMP_InputField player2BetInput;
-    public TextMeshProUGUI player1BalanceText;
-    public TextMeshProUGUI player2BalanceText;
-    public TextMeshProUGUI player1HandValueText;
-    public TextMeshProUGUI player2HandValueText;
-    public TextMeshProUGUI gameStatusText;
-    public Button btnNewGame;
-    public Button btnDealCards;
-    public Transform dealerCardArea;
-    public TextMeshProUGUI dealerHandValueText;
+    [Header("Deck & Dealer")]
+    public DeckManager deckManager;                  // Manages the deck, deals cards
+    public Transform dealerCardArea;                 // Where dealer’s cards spawn
+    public TextMeshProUGUI dealerHandValueText;      // Displays dealer's hand value
 
-    // Player and Dealer Data
+    [Header("Player 1 UI References")]
+    public PlayerController player1Controller;       // Single-player controller for Player 1
+    public TMP_InputField player1Input;              // Name input (from Start Menu or in-scene)
+    public TMP_InputField player1BetInput;           // Bet input field (if used)
+    public TextMeshProUGUI player1BalanceText;         // Displays player's balance
+    public TextMeshProUGUI player1HandValueText;       // Displays player's hand value
+
+    [Header("Game Status & Buttons")]
+    public TextMeshProUGUI gameStatusText;           // Displays messages such as "Place your bet", "Bust!", etc.
+    public Button btnNewGame;                        // Used in Start Menu scene to start game
+    public Button btnDealCards;                      // Deal button to start a round
+    public Button btnRestart;                        // Restart button for game over
+
+    // Player & Dealer data
     private PlayerData player1;
-    private PlayerData player2;
     private List<DeckManager.CardData> player1Hand = new List<DeckManager.CardData>();
-    private List<DeckManager.CardData> player2Hand = new List<DeckManager.CardData>();
     private List<DeckManager.CardData> dealerHand = new List<DeckManager.CardData>();
 
-    private bool player1BetPlaced = false;
-    private bool player2BetPlaced = false;
-    private bool player1HasStood = false;
-    private bool player2HasStood = false;
+    private bool playerBetPlaced = false;
+    private bool playerHasStood = false;
 
     void Start()
     {
-        // Check if we're in the Start Menu or Game Play scene
+        // In Start Menu scene, set up "New Game" button
         if (SceneManager.GetActiveScene().name == "Start Menu")
         {
-            // In Start Menu scene, just set up the start game button
             if (btnNewGame != null)
                 btnNewGame.onClick.AddListener(StartGame);
         }
-        else // We're in the Game Play scene
+        else
         {
-            // Get player names from PlayerPrefs if they exist
-            string player1Name = PlayerPrefs.GetString("Player1Name", "Player 1");
-            string player2Name = PlayerPrefs.GetString("Player2Name", "Player 2");
-
-            // Initialize with the player names
-            player1 = new PlayerData(player1Name);
-            player2 = new PlayerData(player2Name);
+            // In Game Play scene, retrieve the stored player name and initialize
+            string storedName = PlayerPrefs.GetString("Player1Name", "Player 1");
+            player1 = new PlayerData(storedName);
 
             InitializeGame();
         }
     }
 
-    private void InitializeGame()
-    {
-        SetupButtons();
-        UpdateBalanceUI();
-        player1Controller.SetActionButtons(false);
-        player2Controller.SetActionButtons(false);
-        gameStatusText.text = "Welcome to Blackjack! Place your bets to start.";
-
-        // Allow both players to place bets
-        player1Controller.EnableBettingOnly(true);
-        player2Controller.EnableBettingOnly(true);
-    }
-
-    private void SetupButtons()
-    {
-        // Only set up these buttons in the Game Play scene
-        if (btnDealCards != null)
-            btnDealCards.onClick.AddListener(StartNewRound);
-
-        if (player1Controller != null && player1Controller.btnHit != null)
-            player1Controller.btnHit.onClick.AddListener(() => PlayerHit(1));
-
-        if (player2Controller != null && player2Controller.btnHit != null)
-            player2Controller.btnHit.onClick.AddListener(() => PlayerHit(2));
-
-        if (player1Controller != null && player1Controller.btnStand != null)
-            player1Controller.btnStand.onClick.AddListener(() => PlayerStand(1));
-
-        if (player2Controller != null && player2Controller.btnStand != null)
-            player2Controller.btnStand.onClick.AddListener(() => PlayerStand(2));
-    }
-
+    /// <summary>
+    /// Called in the Start Menu when "New Game" is pressed.
+    /// Stores player name and loads the Game Play scene.
+    /// </summary>
     public void StartGame()
     {
-        // Store player names in PlayerPrefs to persist between scenes
-        if (player1Input != null)
-            PlayerPrefs.SetString("Player1Name", player1Input.text.Length > 0 ? player1Input.text : "Player 1");
+        if (player1Input != null && player1Input.text.Length > 0)
+            PlayerPrefs.SetString("Player1Name", player1Input.text);
+        else
+            PlayerPrefs.SetString("Player1Name", "Player 1");
 
-        if (player2Input != null)
-            PlayerPrefs.SetString("Player2Name", player2Input.text.Length > 0 ? player2Input.text : "Player 2");
-
-        // Now load the Game Play scene
         SceneManager.LoadScene("Game Play");
     }
 
+    /// <summary>
+    /// Initializes the game in the Game Play scene.
+    /// Sets up deck, UI, and clears any previous hands.
+    /// </summary>
+    private void InitializeGame()
+    {
+        // Update the PlayerController's name input field if available
+        if (player1Controller != null && player1 != null)
+        {
+            if (player1Controller.playerNameInput != null)
+                player1Controller.playerNameInput.text = player1.playerName;
+        }
+
+        // Initialize and shuffle deck; clear hands
+        deckManager.ResetDeck();
+        deckManager.ShuffleDeck();
+
+        player1Hand.Clear();
+        dealerHand.Clear();
+
+        // Hook up the Deal button if available
+        if (btnDealCards != null)
+            btnDealCards.onClick.AddListener(StartNewRound);
+
+        // Hide the Restart button at initialization
+        if (btnRestart != null)
+            btnRestart.gameObject.SetActive(false);
+
+        // Show welcome message
+        gameStatusText.text = "Welcome to Blackjack! Place your bet to start.";
+
+        UpdateBalanceUI();
+        playerBetPlaced = false;
+        playerHasStood = false;
+    }
+
+    /// <summary>
+    /// Called by the PlayerController when a bet is placed.
+    /// For single-player, this simply marks that a bet is in.
+    /// </summary>
+    public void PlayerPlacedBet(int playerNumber, int betAmount)
+    {
+        // Ensure this is for Player 1 (in a single-player game, playerNumber must be 1)
+        if (playerNumber == 1)
+        {
+            playerBetPlaced = true;
+            gameStatusText.text = "Bet placed. Click Deal to begin!";
+        }
+    }
+
+    /// <summary>
+    /// Starts a new round by checking that a bet is placed, then dealing cards and updating UI.
+    /// </summary>
     public void StartNewRound()
     {
-        if (!player1BetPlaced || !player2BetPlaced)
+        if (!playerBetPlaced)
         {
-            gameStatusText.text = "Both players need to place bets first!";
+            gameStatusText.text = "You must place a bet first!";
             return;
         }
 
@@ -118,143 +130,172 @@ public class GameManager : MonoBehaviour
         UpdateUIForRoundStart();
     }
 
+    /// <summary>
+    /// Resets the round state: clears hands, resets deck, and updates UI.
+    /// </summary>
     private void ResetRound()
     {
         player1Hand.Clear();
-        player2Hand.Clear();
         dealerHand.Clear();
+
         deckManager.ResetDeck();
         deckManager.ShuffleDeck();
-        UpdateHandValueDisplay(1, 0);
-        UpdateHandValueDisplay(2, 0);
-        dealerHandValueText.text = "Dealer: ?";
 
-        // Reset bet flags and update UI
-        player1BetPlaced = false;
-        player2BetPlaced = false;
-        player1HasStood = false;
-        player2HasStood = false;
+        playerHasStood = false;
+        playerBetPlaced = false;  // If you want the bet to carry over for the session, you could modify this
+
+        if (player1HandValueText)
+            player1HandValueText.text = "Hand: 0";
+        if (dealerHandValueText)
+            dealerHandValueText.text = "Dealer: ?";
     }
 
+    /// <summary>
+    /// Deals the initial cards: two to player and two to dealer (one hidden).
+    /// Updates hand values on the UI.
+    /// </summary>
     private void DealInitialCards()
     {
-        for (int i = 0; i < 2; i++)
-        {
-            player1Hand.Add(deckManager.DealCardToPlayer(1));
-            player2Hand.Add(deckManager.DealCardToPlayer(2));
-        }
+        // Deal two cards to the player
+        player1Hand.Add(deckManager.DealCardToPlayer(1));
+        player1Hand.Add(deckManager.DealCardToPlayer(1));
 
-        UpdateHandValueDisplay(1, CalculateHandValue(player1Hand));
-        UpdateHandValueDisplay(2, CalculateHandValue(player2Hand));
+        // Deal two cards to the dealer
+        dealerHand.Add(deckManager.DealCardToDealer());
+        dealerHand.Add(deckManager.DealCardToDealer());
+
+        int pVal = CalculateHandValue(player1Hand);
+        UpdateHandValueDisplay(pVal);
+
+        // For the dealer, only show the first card's value and hide the second
+        dealerHandValueText.text = "Dealer: " + dealerHand[0].value + " + ?";
     }
 
+    /// <summary>
+    /// Updates the UI for round start and enables player's Hit/Stand actions.
+    /// </summary>
     private void UpdateUIForRoundStart()
     {
+        gameStatusText.text = "Player 1's Turn: Hit or Stand";
         player1Controller.SetActionButtons(true);
-        player2Controller.SetActionButtons(false);
-        gameStatusText.text = "Player 1's Turn";
     }
 
-    public void PlayerPlacedBet(int playerNumber, int betAmount)
-    {
-        if (playerNumber == 1)
-            player1BetPlaced = true;
-        else
-            player2BetPlaced = true;
-
-        UpdateGameStatusAfterBets();
-    }
-
-    private void UpdateGameStatusAfterBets()
-    {
-        if (player1BetPlaced && player2BetPlaced)
-        {
-            gameStatusText.text = "Both players placed bets. Ready to deal cards.";
-        }
-        else if (player1BetPlaced)
-        {
-            gameStatusText.text = "Player 1 bet placed. Waiting for Player 2.";
-        }
-        else
-        {
-            gameStatusText.text = "Player 2 bet placed. Waiting for Player 1.";
-        }
-    }
-
+    /// <summary>
+    /// Called by the PlayerController when the player hits.
+    /// Deals one card to the player and updates the hand value.
+    /// </summary>
     public void PlayerHit(int playerNumber)
     {
-        List<DeckManager.CardData> currentHand = playerNumber == 1 ? player1Hand : player2Hand;
-        DeckManager.CardData newCard = deckManager.DealCardToPlayer(playerNumber);
-        currentHand.Add(newCard);
+        if (playerNumber != 1) return;
 
-        int handValue = CalculateHandValue(currentHand);
-        UpdateHandValueDisplay(playerNumber, handValue);
+        DeckManager.CardData newCard = deckManager.DealCardToPlayer(1);
+        player1Hand.Add(newCard);
 
-        if (handValue > 21)
+        int pVal = CalculateHandValue(player1Hand);
+        UpdateHandValueDisplay(pVal);
+
+        if (pVal > 21)
         {
-            HandlePlayerBust(playerNumber);
+            gameStatusText.text = "Bust! Dealer wins!";
+            EndRound(playerWin: false);
         }
     }
 
-    private void HandlePlayerBust(int playerNumber)
-    {
-        gameStatusText.text = $"Player {playerNumber} Busted!";
-        player1Controller.SetActionButtons(playerNumber == 2);
-        player2Controller.SetActionButtons(playerNumber == 1);
-
-        CheckIfRoundShouldEnd();
-    }
-
+    /// <summary>
+    /// Called by the PlayerController when the player stands.
+    /// Proceeds to dealer's turn.
+    /// </summary>
     public void PlayerStand(int playerNumber)
     {
-        if (playerNumber == 1)
+        if (playerNumber != 1) return;
+
+        playerHasStood = true;
+        player1Controller.SetActionButtons(false);
+        DealerTurn();
+    }
+
+    /// <summary>
+    /// Dealer's turn: reveal dealer's hand, draw until reaching 17, then determine outcome.
+    /// </summary>
+    private void DealerTurn()
+    {
+        int dealerValue = CalculateHandValue(dealerHand);
+        dealerHandValueText.text = "Dealer: " + dealerValue;
+
+        while (dealerValue < 17)
         {
-            player1HasStood = true;
-            player1Controller.SetActionButtons(false);
+            dealerHand.Add(deckManager.DealCardToDealer());
+            dealerValue = CalculateHandValue(dealerHand);
+            dealerHandValueText.text = "Dealer: " + dealerValue;
+        }
+
+        if (dealerValue > 21)
+        {
+            gameStatusText.text = "Dealer busts! Player 1 wins!";
+            EndRound(playerWin: true);
         }
         else
         {
-            player2HasStood = true;
-            player2Controller.SetActionButtons(false);
-        }
-
-        gameStatusText.text = $"Player {playerNumber} stands.";
-
-        CheckIfRoundShouldEnd();
-    }
-
-    private void CheckIfRoundShouldEnd()
-    {
-        if (player1HasStood && player2HasStood)
-        {
-            EndRound();
-        }
-        else if (player1HasStood)
-        {
-            gameStatusText.text = "Player 2's Turn";
-            player2Controller.SetActionButtons(true);
-        }
-        else if (player2HasStood)
-        {
-            gameStatusText.text = "Player 1's Turn";
-            player1Controller.SetActionButtons(true);
+            int playerVal = CalculateHandValue(player1Hand);
+            if (playerVal > dealerValue)
+            {
+                gameStatusText.text = "Player 1 wins!";
+                EndRound(playerWin: true);
+            }
+            else if (playerVal < dealerValue)
+            {
+                gameStatusText.text = "Dealer wins!";
+                EndRound(playerWin: false);
+            }
+            else
+            {
+                gameStatusText.text = "It's a tie!";
+                EndRound(playerWin: null);
+            }
         }
     }
 
-    private void UpdateHandValueDisplay(int playerNumber, int value)
+    /// <summary>
+    /// Ends the round: updates balance, checks game over, and updates UI.
+    /// </summary>
+    /// <param name="playerWin">
+    /// true if player wins, false if dealer wins, null if tie.
+    /// </param>
+    private void EndRound(bool? playerWin)
     {
-        if (playerNumber == 1)
+        // Here you would modify the player's balance based on the outcome.
+        // For example:
+        // if (playerWin == true) { player1.balance += betAmount; }
+        // if (playerWin == false) { player1.balance -= betAmount; }
+        // On tie, no change.
+        // (This example does not track bet amounts explicitly.)
+
+        UpdateBalanceUI();
+
+        if (player1.balance <= 0)
         {
-            player1HandValueText.text = $"Hand: {value}";
-            player1Controller.UpdateHandValue(value);
+            gameStatusText.text += "\nYou are out of money. Game Over!";
+            if (btnRestart != null)
+                btnRestart.gameObject.SetActive(true);
         }
         else
         {
-            player2HandValueText.text = $"Hand: {value}";
-            player2Controller.UpdateHandValue(value);
+            gameStatusText.text += "\nRound over. Place a new bet for the next round.";
         }
     }
 
+    /// <summary>
+    /// Updates the balance text using the PlayerData balance.
+    /// </summary>
+    private void UpdateBalanceUI()
+    {
+        if (player1BalanceText != null)
+            player1BalanceText.text = "Balance: $" + player1.balance;
+    }
+
+    /// <summary>
+    /// Calculates the hand value, treating Aces as 11 or 1 appropriately.
+    /// </summary>
     private int CalculateHandValue(List<DeckManager.CardData> hand)
     {
         int total = 0;
@@ -263,7 +304,8 @@ public class GameManager : MonoBehaviour
         foreach (var card in hand)
         {
             total += card.value;
-            if (card.name.ToLower().StartsWith("ace")) aceCount++;
+            if (card.name.ToLower().StartsWith("ace"))
+                aceCount++;
         }
 
         while (total > 21 && aceCount > 0)
@@ -275,79 +317,28 @@ public class GameManager : MonoBehaviour
         return total;
     }
 
-    private void UpdateBalanceUI()
+    /// <summary>
+    /// Updates the player's hand value display.
+    /// </summary>
+    private void UpdateHandValueDisplay(int handValue)
     {
-        player1BalanceText.text = $"Balance: ${player1.balance}";
-        player2BalanceText.text = $"Balance: ${player2.balance}";
-        player1Controller.SetBalance(player1.balance);
-        player2Controller.SetBalance(player2.balance);
+        if (player1HandValueText)
+            player1HandValueText.text = "Hand: " + handValue;
     }
 
-    // End of Round Logic
-    public void EndRound()
+    /// <summary>
+    /// Called by the Restart button to reset the game.
+    /// </summary>
+    public void RestartGame()
     {
-        int dealerValue = CalculateHandValue(dealerHand);
-        int player1Value = CalculateHandValue(player1Hand);
-        int player2Value = CalculateHandValue(player2Hand);
+        // Reset the player's balance to the default value.
+        player1.balance = 1000;
+        if (btnRestart != null)
+            btnRestart.gameObject.SetActive(false);
 
-        string resultMessage = "Round over: ";
+        ResetRound();
+        UpdateBalanceUI();
 
-        // Check if the dealer busted
-        if (dealerValue > 21)
-        {
-            resultMessage += "Dealer busts! ";
-            resultMessage += DetermineWinner(player1Value, 21, 1); // Pass dealer value as 21 when the dealer busts
-            resultMessage += DetermineWinner(player2Value, 21, 2); // Pass dealer value as 21 when the dealer busts
-        }
-        else
-        {
-            resultMessage += DetermineWinner(player1Value, dealerValue, 1);
-            resultMessage += DetermineWinner(player2Value, dealerValue, 2);
-        }
-
-        gameStatusText.text = resultMessage;
-    }
-
-    private string DetermineWinner(int playerValue, int dealerValue, int playerNumber)
-    {
-        if (playerValue > 21)
-            return $"Player {playerNumber} busts. ";
-        else if (playerValue > dealerValue)
-            return $"Player {playerNumber} wins. ";
-        else if (playerValue == dealerValue)
-            return $"Player {playerNumber} pushes. ";
-        else
-            return $"Player {playerNumber} loses. ";
+        gameStatusText.text = "Game restarted. Place your bet!";
     }
 }
-int dealerTotal = CalculateDealerTotal(); // your function
-dealerHandValueText.text = "Dealer Hand: " + dealerTotal;
-
-
-playerBalanceText.text = "Balance: $" + playerBalance;
-playerBetText.text = "Bet: $" + currentBet;
-playerHandValueText.text = "Hand: " + playerHandTotal;
-
-if (playerTotal > 21)
-{
-    endGameMessage.text = player1Name + " busted! Dealer wins!";
-}
-else if (dealerTotal > 21)
-{
-    endGameMessage.text = "Dealer busts! " + player1Name + " wins!";
-}
-else if (playerTotal > dealerTotal)
-{
-    endGameMessage.text = player1Name + " wins!";
-}
-else if (dealerTotal > playerTotal)
-{
-    endGameMessage.text = "Dealer wins!";
-}
-else
-{
-    endGameMessage.text = "It's a tie!";
-}
-
-// Show the message
-endGameMessage.gameObject.SetActive(true);
