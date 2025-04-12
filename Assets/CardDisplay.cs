@@ -13,7 +13,9 @@ public class CardDisplay : MonoBehaviour
 
     public int cardIndex;   // Index to represent the current card face
 
-    // Changed from SpriteRenderer to Image since we're using UI elements
+    private string cardNameStr;
+    private int cardValueInt;
+    private Sprite cardFaceSprite;
 
     public void Setup(Sprite image, string name, int value)
     {
@@ -23,7 +25,15 @@ public class CardDisplay : MonoBehaviour
             return;
         }
 
+        // Store the card data
+        cardNameStr = name;
+        cardValueInt = value;
+        cardFaceSprite = image;  // Store the directly passed sprite
+
+        // Set the image directly from the parameter
         cardImage.sprite = image;
+
+        Debug.Log("Setting up card: " + name + " with value " + value + ", sprite: " + (image != null ? image.name : "null"));
 
         if (cardName != null)
             cardName.text = name;
@@ -31,13 +41,10 @@ public class CardDisplay : MonoBehaviour
         if (cardValue != null)
             cardValue.text = value.ToString();
 
-        // Make sure the card face is showing (not the back)
-        ShowCardFace(true);
-
-        Debug.Log("Card setup complete: " + name + " with value " + value);
+        // Set a meaningful name for debugging
+        gameObject.name = "Card_" + name;
     }
 
-    // New method to show/hide card face
     public void ShowCardFace(bool showFace)
     {
         if (cardImage == null)
@@ -48,12 +55,22 @@ public class CardDisplay : MonoBehaviour
 
         if (showFace)
         {
-            // If we have a valid index and faces array, show that face
-            if (faces != null && faces.Length > 0 && cardIndex >= 0 && cardIndex < faces.Length)
+            // First priority: use the stored face sprite that was passed in Setup
+            if (cardFaceSprite != null)
+            {
+                cardImage.sprite = cardFaceSprite;
+                Debug.Log("Showing face for card: " + cardNameStr + " using stored sprite: " + cardFaceSprite.name);
+            }
+            // Fallback: if no stored sprite but we have faces array and valid index, use that
+            else if (faces != null && faces.Length > 0 && cardIndex >= 0 && cardIndex < faces.Length)
             {
                 cardImage.sprite = faces[cardIndex];
+                Debug.Log("Showing face for card: " + cardNameStr + " using faces array index: " + cardIndex);
             }
-            // Otherwise use the sprite assigned during Setup
+            else
+            {
+                Debug.LogError("No valid face sprite found for " + cardNameStr);
+            }
         }
         else
         {
@@ -61,13 +78,26 @@ public class CardDisplay : MonoBehaviour
             if (cardBack != null)
             {
                 cardImage.sprite = cardBack;
+                Debug.Log("Showing back for card: " + cardNameStr);
+            }
+            else
+            {
+                Debug.LogError("Card back sprite is null");
             }
         }
     }
 
-    // For backward compatibility with any existing code
+    // For backward compatibility
     public void Toggleface(bool surface)
     {
         ShowCardFace(surface);
+    }
+
+    // For debugging
+    void OnEnable()
+    {
+        // Log when this card is enabled
+        if (!string.IsNullOrEmpty(cardNameStr))
+            Debug.Log("Card enabled: " + cardNameStr);
     }
 }

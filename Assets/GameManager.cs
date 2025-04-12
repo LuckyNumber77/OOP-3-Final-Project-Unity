@@ -365,21 +365,25 @@ public class GameManager : MonoBehaviour
         // Get the current bet amount from player controller
         int betAmount = player1Controller.GetCurrentBet();
 
+        Debug.Log("End of round - Bet amount: " + betAmount + ", Original balance: " + player1.balance);
+
         // Update player balance based on outcome
         if (playerWin == true)
         {
-            // Player wins - add double the bet amount
+            // Player wins - give back the bet amount (which was already subtracted) plus winnings
             player1.balance += betAmount * 2;
+            Debug.Log("Player won! Adding " + (betAmount * 2) + " to balance. New balance: " + player1.balance);
         }
         else if (playerWin == false)
         {
             // Player loses - bet was already deducted when placed
-            // No need to change balance here
+            Debug.Log("Player lost! Bet of " + betAmount + " is forfeit. Balance remains: " + player1.balance);
         }
         else
         {
             // Tie - return the bet amount
             player1.balance += betAmount;
+            Debug.Log("It's a tie! Returning bet of " + betAmount + ". New balance: " + player1.balance);
         }
 
         UpdateBalanceUI();
@@ -476,6 +480,10 @@ public class GameManager : MonoBehaviour
     {
         // Reset the player's balance to the default value.
         player1.balance = 1000;
+
+        // Clear player name from PlayerPrefs
+        PlayerPrefs.DeleteKey("Player1Name");
+
         if (btnRestart != null)
             btnRestart.gameObject.SetActive(false);
 

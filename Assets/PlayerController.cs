@@ -129,21 +129,15 @@ public class PlayerController : MonoBehaviour
         if (balance >= amount)
         {
             currentBet += amount;
-            balance -= amount;
+            balance -= amount; // This line is crucial - it deducts the bet from the balance
+
             UpdateBetDisplayUI();
             UpdateBalanceUI();
+
             Debug.Log("Added bet: " + amount + ". Current bet: " + currentBet + ", Balance: " + balance);
 
             // Enable the Place Bet button when there's a valid bet amount
             if (btnPlaceBet != null) btnPlaceBet.interactable = true;
-
-            // Enable the Clear Bet button when there's a valid bet amount
-            if (btnClearBet != null) btnClearBet.interactable = true;
-
-            // Update chip buttons based on remaining balance
-            if (chip10Button != null) chip10Button.interactable = balance >= 10;
-            if (chip25Button != null) chip25Button.interactable = balance >= 25;
-            if (chip100Button != null) chip100Button.interactable = balance >= 100;
         }
         else
         {
