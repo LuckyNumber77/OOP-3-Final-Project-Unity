@@ -21,6 +21,9 @@ public class DeckManager : MonoBehaviour, IDeckManager
     public Transform player2CardArea;
     public Transform dealerCardArea;
 
+    [Header("Card Spacing")]
+    public float cardSpacing = 100f; // Customizable card spacing
+
     private int currentCardIndex = 0;
 
     /// <summary>  
@@ -33,6 +36,8 @@ public class DeckManager : MonoBehaviour, IDeckManager
         ClearCardArea(player1CardArea);
         ClearCardArea(player2CardArea);
         ClearCardArea(dealerCardArea);
+
+        Debug.Log("All card areas cleared.");
     }
 
     /// <summary>  
@@ -42,10 +47,19 @@ public class DeckManager : MonoBehaviour, IDeckManager
     {
         if (cardArea != null)
         {
-            foreach (Transform child in cardArea)
+            int childCount = cardArea.childCount;
+
+            // Destroy from last to first to avoid index shifting issues
+            for (int i = childCount - 1; i >= 0; i--)
             {
-                Destroy(child.gameObject);
+                Destroy(cardArea.GetChild(i).gameObject);
             }
+
+            Debug.Log($"Cleared {childCount} cards from {cardArea.name}");
+        }
+        else
+        {
+            Debug.LogWarning("Attempted to clear a null card area.");
         }
     }
 
@@ -86,13 +100,13 @@ public class DeckManager : MonoBehaviour, IDeckManager
         }
 
         Transform cardArea = (playerNumber == 1) ? player1CardArea : player2CardArea;
-        return DealCard(cardArea);
+        return DealCard(cardArea, true);
     }
 
     /// <summary>  
     /// Deals a card to the dealer and returns the card data.  
     /// </summary>  
-    public CardData DealCardToDealer()
+    public CardData DealCardToDealer(bool faceUp = true)
     {
         if (dealerCardArea == null)
         {
@@ -106,30 +120,102 @@ public class DeckManager : MonoBehaviour, IDeckManager
             return null;
         }
 
-        return DealCard(dealerCardArea);
+        return DealCard(dealerCardArea, faceUp);
     }
 
     /// <summary>  
     /// Deals a card to the specified card area and returns the card data.  
     /// </summary>  
-    private CardData DealCard(Transform cardArea)
+    private CardData DealCard(Transform cardArea, bool faceUp = true)
     {
-        CardData currentCard = cardDeck[currentCardIndex];
-        GameObject card = Instantiate(cardPrefab, cardArea);
-        CardDisplay display = card.GetComponent<CardDisplay>();
-
-        if (display != null)
+        // Check if we've run out of cards
+        if (currentCardIndex >= cardDeck.Count)
         {
-            display.cardImage.sprite = currentCard.image;
-            display.Setup(currentCard.image, currentCard.name, currentCard.value);
+            Debug.LogWarning("Deck is exhausted! Reshuffling...");
+            ShuffleDeck();
+            currentCardIndex = 0;
+        }
+
+        // Get the current card from the deck list
+        CardData currentCard = cardDeck[currentCardIndex];
+
+        // Check if the card area exists
+        if (cardArea == null)
+        {
+            Debug.LogError("Card area is null. Cannot deal card.");
+            return currentCard;
+        }
+
+        // Instantiate the card prefab as a child of the given card area
+        GameObject card = Instantiate(cardPrefab, cardArea);
+
+        if (card == null)
+        {
+            Debug.LogError("Failed to instantiate card prefab. Check if prefab is assigned.");
+            return currentCard;
+        }
+
+        Debug.Log("Card dealt: " + currentCard.name + " with value " + currentCard.value);
+
+        // Get the RectTransform component if this is a UI element.
+        RectTransform cardRT = card.GetComponent<RectTransform>();
+        if (cardRT != null)
+        {
+            // Use the current number of child objects in the cardArea to determine offset.
+            // Increased spacing for better visibility
+            int cardCount = cardArea.childCount - 1; // Subtract one if the new card is already counted
+            cardRT.anchoredPosition = new Vector2(cardCount * cardSpacing, 0);
+
+            Debug.Log("Card positioned at X offset: " + (cardCount * cardSpacing));
         }
         else
         {
-            Debug.LogWarning("CardDisplay script is missing on card prefab.");
+            Debug.LogWarning("Card doesn't have a RectTransform component. Position may not be as expected.");
         }
 
+        // Set up the card's display details using CardDisplay
+        CardDisplay display = card.GetComponent<CardDisplay>();
+        if (display != null)
+        {
+            display.Setup(currentCard.image, currentCard.name, currentCard.value);
+
+            // Show the card face up or down based on the parameter
+            display.ShowCardFace(faceUp);
+
+            // Set a meaningful name for debugging
+            card.name = currentCard.name + (faceUp ? "_FaceUp" : "_FaceDown");
+        }
+        else
+        {
+            Debug.LogError("CardDisplay script is missing on the card prefab. Please add it to your card prefab.");
+        }
+
+        // Increment the index so the next card is dealt from the deck
         currentCardIndex++;
         return currentCard;
+    }
+
+    /// <summary>
+    /// Flips over all dealer cards to face up (used at the end of a round)
+    /// </summary>
+    public void RevealDealerCards()
+    {
+        if (dealerCardArea != null)
+        {
+            foreach (Transform child in dealerCardArea)
+            {
+                CardDisplay display = child.GetComponent<CardDisplay>();
+                if (display != null)
+                {
+                    display.ShowCardFace(true);
+                    Debug.Log("Revealed dealer card: " + child.name);
+                }
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Dealer card area is not assigned. Cannot reveal cards.");
+        }
     }
 
     /// <summary>  

@@ -13,32 +13,61 @@ public class CardDisplay : MonoBehaviour
 
     public int cardIndex;   // Index to represent the current card face
 
-    private SpriteRenderer spriteRenderer;  // Declare spriteRenderer
-
-
+    // Changed from SpriteRenderer to Image since we're using UI elements
 
     public void Setup(Sprite image, string name, int value)
     {
-        cardImage.sprite = image;
-        cardName.text = name;
-        cardValue.text = value.ToString();  // Assuming you want to display the value as text
-    }
-    // Called to toggle between showing face and back of the card
-    public void Toggleface(bool surface)
-    {
-        if (surface)  // If surface is true, show the card face
+        if (cardImage == null)
         {
-            spriteRenderer.sprite = faces[cardIndex];
+            Debug.LogError("Card image is null on " + gameObject.name);
+            return;
         }
-        else  // Otherwise, show the card back
+
+        cardImage.sprite = image;
+
+        if (cardName != null)
+            cardName.text = name;
+
+        if (cardValue != null)
+            cardValue.text = value.ToString();
+
+        // Make sure the card face is showing (not the back)
+        ShowCardFace(true);
+
+        Debug.Log("Card setup complete: " + name + " with value " + value);
+    }
+
+    // New method to show/hide card face
+    public void ShowCardFace(bool showFace)
+    {
+        if (cardImage == null)
         {
-            spriteRenderer.sprite = cardBack;
+            Debug.LogError("Card image is null on " + gameObject.name);
+            return;
+        }
+
+        if (showFace)
+        {
+            // If we have a valid index and faces array, show that face
+            if (faces != null && faces.Length > 0 && cardIndex >= 0 && cardIndex < faces.Length)
+            {
+                cardImage.sprite = faces[cardIndex];
+            }
+            // Otherwise use the sprite assigned during Setup
+        }
+        else
+        {
+            // Show card back
+            if (cardBack != null)
+            {
+                cardImage.sprite = cardBack;
+            }
         }
     }
 
-    // Initialize spriteRenderer
-    private void Awake()
+    // For backward compatibility with any existing code
+    public void Toggleface(bool surface)
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();  // Corrected: fixed typo in component name ("SpriteRenderer" instead of "SpriteRendered")
+        ShowCardFace(surface);
     }
 }
